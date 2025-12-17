@@ -19,24 +19,28 @@ typedef int8_t   i8;
 typedef float f32;
 typedef double f64;
 
-typedef struct vec2
+struct vec2
 {
     f32 x;
     f32 y;
-	
+	vec2() = default;
+	vec2(f32 a, f32 b) : x(a), y(b) {}
 	std::string to_string(void) const
 	{
 		char buffer[64];
 		std::snprintf(buffer, sizeof(buffer), "%.2f, %.2f\n", x, y);
 		return buffer;
 	}
-} vec2;
+};
 
-typedef struct vec3
+struct vec3
 {
     f32 x;
     f32 y;
     f32 z;
+
+	vec3() = default;
+	vec3(f32 a, f32 b, f32 c) : x(a), y(b), z(c) {}
 
 	std::string to_string(void) const
 	{
@@ -45,7 +49,7 @@ typedef struct vec3
 		return buffer;
 	}
 
-} vec3;
+};
 
 
 #endif
