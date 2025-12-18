@@ -20,9 +20,11 @@ f32 Signf32(f32 val)
 vec2 Vec2xScalar(vec2 v, f32 s)
 {
     return {v.x * s, v.y * s};
-
 }
-
+vec3 Vec3xScalar(vec3 v, f32 s)
+{
+    return {v.x * s, v.y * s, v.z * s};
+}
 vec2 Vec2Add(vec2 v1, vec2 v2)
 {
     return {v1.x+v2.x, v1.y+v2.y};
@@ -42,6 +44,28 @@ f32 Maxf32(f32 a, f32 b)
 {
     return a > b ? a : b;
 }
+
+vec3 Vec3Cross(vec3 v1, vec3 v2)
+{
+    return {
+        (v1.y * v2.z) - (v1.z * v2.y),
+        (v1.z * v2.x) - (v1.x * v2.z),
+        (v1.x * v2.y) - (v1.y * v2.x),
+    };
+}
+
+vec2 Vec2Normalize(vec2 v)
+{
+    float mag = Vec2Length(v); 
+    return mag == 0 ? vec2{0, 0} : vec2{v.x /mag, v.y/mag};
+}
+
+vec3 Vec3Normalize(vec3 v)
+{
+    float mag = Vec3Length(v); 
+    return mag == 0 ? vec3{0, 0, 0} : vec3{v.x /mag, v.y/mag, v.z/mag};
+}
+
 
 vec2 Vec2Dir(vec2 v)
 {
@@ -84,6 +108,12 @@ f32 Vec2Length(vec2 v)
 {
     return sqrtf(powf(v.x, 2) + powf(v.y, 2)); 
 }
+
+f32 Vec3Length(vec3 v)
+{
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2)); 
+}
+
 
 f32 Angle2Vectors(vec2 v1, vec2 v2)
 {

@@ -26,6 +26,7 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS
 
 add_executable(t_gen ${MY_SOURCES})
 
+
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC SHADERS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/shaders/")
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC NOISE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/noises/")
 target_include_directories(t_gen PUBLIC

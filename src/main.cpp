@@ -4,6 +4,7 @@
 #include "vstd/vlogger.h"
 #include "vstd/vgeneral.h"
 #include "main.h"
+#include "camera.h"
 #include "iostream"
 #include <array>
 #include "shaders.h"
@@ -11,13 +12,27 @@
 #include "perlin.h"
 #include <random>
 #include "shapes.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+constexpr auto WIDTH = 1200.0f;
+constexpr auto HEIGHT = 1000.0f;
+constexpr auto ASPECT_RATIO = WIDTH / HEIGHT;
+constexpr auto FOVY = 45.0f;
+constexpr auto NEAR_PLANE = 0.01f;
+constexpr auto FAR_PLANE = 100.0f;
 
 
-constexpr auto WIDTH = 400;
-constexpr auto HEIGHT = 400;
+
 constexpr auto CHANNEL_NUM = 4;
 
 constexpr auto SIZE_COLOR_BUFFER = WIDTH * HEIGHT * CHANNEL_NUM;
+
+// camera
+Camera camera({ 0.0f, 0.0f, 3.0f });
+float lastX = WIDTH * 0.5f;
+float lastY = HEIGHT * 0.5f;
+bool firstMouse = true;
 
 std::random_device rd;
 std::mt19937 mt(rd());
@@ -30,36 +45,40 @@ int main()
 	
 	GLFWwindow *Window = GetGLFWWindow();
 	glViewport(0, 0, WIDTH, HEIGHT);
-	glfwSetFramebufferSizeCallback(Window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(Window, framebuffer_size_callback);	
+	glfwSetCursorPosCallback(Window, mouse_callback);
+	glfwSetScrollCallback(Window, scroll_callback);
 
+	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	Shader shader(SHADERS_PATH "vs.glsl", SHADERS_PATH "fs.glsl");
-	Quad quad(5);
+	Quad quad(50);
+	quad.LoadTexture(NOISE_PATH "01.png");
 
-	//u32 texture;
-	//glGenTextures(1, &texture);
-	//glBindTexture(GL_TEXTURE_2D, texture);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glEnable(GL_DEPTH_TEST);
+	glm::mat4 model_mat = glm::mat4(1.0f);
+	model_mat *= glm::translate(model_mat, glm::vec3(0.0f, .0f, -2.0f));
+	//model_mat *= glm::rotate(model_mat, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)0);
-
-	//glBindTexture(GL_TEXTURE_2D, texture);
-	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, ColorBuffer);
-
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	glm::mat4 proj_mat = glm::perspective(glm::radians(FOVY), ASPECT_RATIO, NEAR_PLANE, FAR_PLANE);
+	f32 delta_time = 0.0f;
+	f32 last_frame = 0.0f;
 	while (!glfwWindowShouldClose(Window))
 	{
-		processInput(Window);
+		f32 current_frame = static_cast<f32>(glfwGetTime());
+		delta_time = current_frame - last_frame;
+		last_frame = current_frame;
+
+		ProcessInput(Window, delta_time);
+		
 
 		glClearColor(0.1f, 0.4f, 0.7f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		shader.SetMat4("model_mat", model_mat);
+		shader.SetMat4("proj_mat", proj_mat);
+		shader.SetMat4("view_mat", camera.GetViewMatrix());
+		quad.Draw(shader); 
 		
-		quad.Draw(shader.GetProgram()); 
 
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
@@ -72,39 +91,52 @@ int main()
 }
 
 
+void ProcessInput(GLFWwindow * window, f32 delta_time)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcessKeyboard(FORWARD, delta_time);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcessKeyboard(BACKWARD, delta_time);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcessKeyboard(LEFT, delta_time);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcessKeyboard(RIGHT, delta_time);
+}
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 }
 
 
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
-	}
-
-/*	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-	{
-
-		GeneratePerlinNoise(buff, WIDTH, HEIGHT, distrib(mt), distrib(mt), distrib(mt));
-		std::cout << "MORE\n";
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-	{
-
-		std::random_device rd;
-		std::mt19937 jd(rd());
-		std::uniform_int_distribution<i64>distrib(1, 3284557443);
-		i64 seed = distrib(jd);
-		SetNewSeed(seed);
-		std::cout << "New seed = " << seed << std::endl;
-		GeneratePerlinNoise(buff, WIDTH, HEIGHT, 1, 1, 1.2);
-	*/
-}
+//void processInput(GLFWwindow* window)
+//{
+//	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+//	{
+//		glfwSetWindowShouldClose(window, true);
+//	}
+//
+///*	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+//	{
+//
+//		GeneratePerlinNoise(buff, WIDTH, HEIGHT, distrib(mt), distrib(mt), distrib(mt));
+//		std::cout << "MORE\n";
+//	}
+//
+//	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+//	{
+//
+//		std::random_device rd;
+//		std::mt19937 jd(rd());
+//		std::uniform_int_distribution<i64>distrib(1, 3284557443);
+//		i64 seed = distrib(jd);
+//		SetNewSeed(seed);
+//		std::cout << "New seed = " << seed << std::endl;
+//		GeneratePerlinNoise(buff, WIDTH, HEIGHT, 1, 1, 1.2);
+//	*/
+//}
 
 
 
@@ -146,4 +178,31 @@ GLFWwindow* GetGLFWWindow()
 	}
 
 	return Window;	
+}
+
+void mouse_callback(GLFWwindow* window, f64 xposIn, f64 yposIn)
+{
+	float xpos = static_cast<f32>(xposIn);
+	float ypos = static_cast<f32>(yposIn);
+
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+	lastX = xpos;
+	lastY = ypos;
+
+	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+
+void scroll_callback(GLFWwindow* window, f64 xoffset, f64 yoffset)
+{
+	camera.ProcessMouseScroll(static_cast<f32>(yoffset));
 }

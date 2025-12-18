@@ -3,9 +3,9 @@
 
 #include "vtypes.h"
 
-#define INFO(msg) Logger::Info(msg, call_location{__FILE__, __func__, __LINE__})  
-#define WARN(msg) Logger::Warn(msg, call_location{__FILE__, __func__, __LINE__})  
-#define ERROR(msg) Logger::Error(msg, call_location{__FILE__, __func__, __LINE__})  
+#define V_LOG_INFO(msg) Logger::Info(msg, call_location{__FILE__, __func__, __LINE__})  
+#define V_LOG_WARN(msg) Logger::Warn(msg, call_location{__FILE__, __func__, __LINE__})  
+#define V_LOG_ERROR(msg) Logger::Error(msg, call_location{__FILE__, __func__, __LINE__})  
 
 typedef struct call_location{
     const char * file;

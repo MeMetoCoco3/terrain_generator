@@ -1,9 +1,11 @@
 
+#pragma once
 #ifndef VSTD
 #define VSTD
 #include <cstdio>
 #include <string>
 #include <stdint.h>
+#include <glm/glm.hpp>
 
 typedef uint32_t u64;
 typedef uint32_t u32;
@@ -23,7 +25,7 @@ struct vec2
 {
     f32 x;
     f32 y;
-	vec2() = default;
+	vec2() : x(0.0f), y(0.0f) {};
 	vec2(f32 a, f32 b) : x(a), y(b) {}
 	std::string to_string(void) const
 	{
@@ -31,6 +33,33 @@ struct vec2
 		std::snprintf(buffer, sizeof(buffer), "%.2f, %.2f\n", x, y);
 		return buffer;
 	}
+
+	vec2 operator+(const vec2& other) const
+	{
+		return { x + other.x, y + other.y };
+	}
+
+	vec2& operator+=(const vec2& other) 
+	{
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	vec2 operator-(const vec2& other) const
+	{
+		return { x - other.x, y - other.y };
+	}
+
+	vec2& operator-=(const vec2& other) 
+	{
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
+
+
 };
 
 struct vec3
@@ -39,7 +68,7 @@ struct vec3
     f32 y;
     f32 z;
 
-	vec3() = default;
+	vec3() : x(0.0f), y(0.0f), z(0.0f) {};
 	vec3(f32 a, f32 b, f32 c) : x(a), y(b), z(c) {}
 
 	std::string to_string(void) const
@@ -48,6 +77,37 @@ struct vec3
 		std::snprintf(buffer, sizeof(buffer), "%.2f, %.2f, %.2f\n", x, y, z);
 		return buffer;
 	}
+
+	explicit operator glm::vec3() const {
+		return glm::vec3{ x, y, z };
+	}
+
+	vec3 operator+(const vec3& other) const
+	{
+		return { x + other.x, y + other.y, z + other.z };
+	}
+
+	vec3& operator+=(const vec3& other) 
+	{
+		x += other.x;
+		y += other.y;
+		z += other.z;
+		return *this;
+	}
+
+	vec3 operator-(const vec3& other) const
+	{
+		return { x - other.x, y - other.y, z - other.z };
+	}
+
+	vec3& operator-=(const vec3& other) 
+	{
+		x -= other.x;
+		y -= other.y;
+		z -= other.z;
+		return *this;
+	}
+
 
 };
 

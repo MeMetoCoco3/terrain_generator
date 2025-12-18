@@ -2,15 +2,18 @@
 #include "algorithm"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <string>
 
-void Shape::Draw(u32 program)
+void Shape::Draw(const Shader& shader)
 {
-	glUseProgram(program);
+	shader.UseProgram();
 	glBindVertexArray(this->m_VAO);
 	for (int i = 0; i < this->m_Textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, this->m_Textures[i]);
+
+		shader.SetInt(std::string("texture" + std::to_string(i)), i);
 	}
 	glDrawElements(GL_TRIANGLES, this->m_Indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

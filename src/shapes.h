@@ -2,6 +2,7 @@
 #define SHAPES_H
 
 #include "vstd/vtypes.h"
+#include "shaders.h"
 #include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,6 +14,7 @@ namespace S_FILES
 	inline std::unordered_map<std::string, u32> Textures;
 }
 
+constexpr auto MAX_DEF_LEVEL = 50;
 
 class Shape 
 {
@@ -27,10 +29,10 @@ protected:
 public:
 	Shape(u32 def_level)
 	{
-		m_DefinitionLevel = def_level > 10 ? 10 : def_level;
+		m_DefinitionLevel = def_level > MAX_DEF_LEVEL ? MAX_DEF_LEVEL : def_level;
 	}
 	virtual ~Shape() = default;
-	void Draw(u32 program);
+	void Draw(Shader const &);
 	u32 LoadTexture(const char* file_path);
 	void AddTexture(u32 texture_id, int id);
 };
