@@ -14,7 +14,7 @@ namespace S_FILES
 	inline std::unordered_map<std::string, u32> Textures;
 }
 
-constexpr auto MAX_DEF_LEVEL = 50;
+constexpr auto MAX_DEF_LEVEL = 1000;
 
 class Shape 
 {

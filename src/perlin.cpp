@@ -15,9 +15,10 @@ void GeneratePerlinNoise(void* buff, int w, int h, f32 freq, f32 amp, f32 contra
 	
 	
 	u8* Channel = (u8*)buff;
-	for (int x = 0; x < w; x++)
+
+	for (int y = 0; y < h; y++)
 	{
-		for (int y = 0; y < h; y++)
+		for (int x = 0; x < w; x++)
 		{
 			f32 Val = 0;
 

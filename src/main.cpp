@@ -51,8 +51,8 @@ int main()
 
 	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	Shader shader(SHADERS_PATH "vs.glsl", SHADERS_PATH "fs.glsl");
-	Quad quad(50);
-	quad.LoadTexture(NOISE_PATH "01.png");
+	Quad quad(9999);
+	quad.LoadTexture(NOISE_PATH "02.png");
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//glEnable(GL_DEPTH_TEST);
